@@ -1,0 +1,59 @@
+name: Bump plugin versions
+
+on:
+  push:
+    branches: [main]
+    paths: ["plugins/**"]
+
+permissions:
+  contents: write
+  pull-requests: read
+  issues: read
+
+concurrency:
+  group: bump-plugin-versions
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read bump levels from merged PRs
+        env:
+          BEFORE: ${{ github.event.before }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash .github/scripts/advisor-bump-levels.sh "$BEFORE" > "$RUNNER_TEMP/bump-levels.txt"
+          echo "Advisor recommendations:"
+          cat "$RUNNER_TEMP/bump-levels.txt"
+
+      - name: Bump changed plugin versions
+        id: bump
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          bumped=$(bash .github/scripts/bump-plugin-versions.sh "$BEFORE" "$RUNNER_TEMP/bump-levels.txt")
+          echo "$bumped"
+          {
+            echo "bumped<<EOF"
+            echo "$bumped"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.bump.outputs.bumped != ''
+        env:
+          BUMPED: ${{ steps.bump.outputs.bumped }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Bump plugin versions [skip ci]" -m "$BUMPED"
+          for attempt in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git pull --rebase origin main
+          done
+          exit 1

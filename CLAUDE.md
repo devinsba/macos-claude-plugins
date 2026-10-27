@@ -23,6 +23,15 @@ The repo is a Claude Code plugin marketplace:
   - `.mcp.json` — bundled MCP servers
 - Reference files inside a plugin with `${CLAUDE_PLUGIN_ROOT}` rather than absolute paths.
 
+## Versioning
+
+Don't bump plugin versions by hand. Two workflows handle it:
+
+1. `version-bump-advisor` (a gh-aw agentic workflow; edit `version-bump-advisor.md`, then run `gh aw compile` to regenerate the `.lock.yml`) comments on each PR touching `plugins/**` with a recommended major/minor/patch bump per plugin. The comment ends with a fenced ` ```version-bump ` block of `<plugin>: <level>` lines — that block is a contract, not decoration.
+2. `bump-plugin-versions` runs on push to `main`. `.github/scripts/advisor-bump-levels.sh` finds the PRs merged in the push and reads the newest `version-bump` block posted by `github-actions[bot]` on each; `.github/scripts/bump-plugin-versions.sh` applies those levels (patch for any changed plugin without a recommendation, e.g. direct pushes) and pushes a `[skip ci]` commit back to `main`.
+
+A plugin whose `version` line was edited in the push (including a newly added plugin) is left as-is, which is how to override the advisor. Pull after merging, since CI adds a commit on top.
+
 ## Testing locally
 
 Load a plugin into a session without installing it:
