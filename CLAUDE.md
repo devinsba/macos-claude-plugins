@@ -28,7 +28,7 @@ The repo is a Claude Code plugin marketplace:
 Don't bump plugin versions by hand. Two workflows handle it:
 
 1. `version-bump-advisor` (a gh-aw agentic workflow; edit `version-bump-advisor.md`, then run `gh aw compile` to regenerate the `.lock.yml`) comments on each PR touching `plugins/**` with a recommended major/minor/patch bump per plugin. The comment ends with a fenced ` ```version-bump ` block of `<plugin>: <level>` lines — that block is a contract, not decoration.
-2. `bump-plugin-versions` runs on push to `main`. `.github/scripts/advisor-bump-levels.sh` finds the PRs merged in the push and reads the newest `version-bump` block posted by `github-actions[bot]` on each; `.github/scripts/bump-plugin-versions.sh` applies those levels (patch for any changed plugin without a recommendation, e.g. direct pushes) and pushes a `[skip ci]` commit back to `main`.
+2. `bump-plugin-versions` runs on push to `main`. `.github/scripts/advisor-bump-levels.sh` finds the PRs merged in the push and reads the newest `version-bump` block posted by `github-actions[bot]` on each; `.github/scripts/bump-plugin-versions.sh` applies those levels (patch for any changed plugin without a recommendation, e.g. direct pushes) and pushes a `[skip ci]` commit back to `main`. It then runs `.github/scripts/tag-plugin-versions.sh`, which creates and pushes an annotated `<plugin-name>-v<version>` tag (name from `plugin.json`) for every plugin whose current version isn't tagged yet, so hand-edited versions and new plugins get tagged too.
 
 A plugin whose `version` line was edited in the push (including a newly added plugin) is left as-is, which is how to override the advisor. Pull after merging, since CI adds a commit on top.
 
