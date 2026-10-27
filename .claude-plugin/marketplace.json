@@ -1,0 +1,17 @@
+{
+  "name": "macos-claude-plugins",
+  "owner": {
+    "name": "Brian Devins",
+    "email": "badevins@gmail.com"
+  },
+  "metadata": {
+    "description": "Claude Code plugins for interacting with macOS"
+  },
+  "plugins": [
+    {
+      "name": "apple-reminders",
+      "source": "./plugins/apple-reminders",
+      "description": "Read and manage Apple Reminders lists and reminders"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "apple-reminders",
+  "version": "0.1.0",
+  "description": "Read and manage Apple Reminders lists and reminders",
+  "author": {
+    "name": "Brian Devins",
+    "email": "badevins@gmail.com"
+  },
+  "keywords": ["macos", "reminders", "applescript"]
+}
